@@ -1,0 +1,24 @@
+body {
+    font-family: sans-serif;
+    margin: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header h1 {
+    color: darkslateblue;
+}
+
+#welcome-section {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: white;
+}
+
+/* Basic styling for the form input */
+#nameForm input[type="text"], 
+#nameForm button {
+    padding: 8px;
+    margin: 5px 0;
+}
