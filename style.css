@@ -94,7 +94,7 @@ footer {
     font-size: 0.9em;
 }
 
-/* --- Responsive Design (Part of Part 3 requirement) --- */
+/* --- Responsive Design --- */
 @media (max-width: 600px) {
     main {
         margin: 10px;
