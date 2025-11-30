@@ -1,6 +1,6 @@
 // --- 1. Weather Code Mapping (Required Function) ---
 function mapWeatherCodeToDescription(code) {
-    // This object maps the WMO Weather interpretation codes (WW) to a human-readable description 
+    // This object maps the WMO Weather interpretation codes (WW) to a human-readable description
     const weatherDescriptions = {
         0: 'clear sky',
         1: 'mainly clear',
@@ -36,7 +36,7 @@ function mapWeatherCodeToDescription(code) {
 
 // --- 2. Fetch Weather Data for Detroit (Required Function) ---
 async function fetchWeather() {
-    // Coordinates for Detroit, Michigan: latitude: 42.3314 and longitude: -83.0458 
+    // Coordinates for Detroit, Michigan: latitude: 42.3314 and longitude: -83.0458
     const DETROIT_LAT = '42.3314';
     const DETROIT_LON = '-83.0458';
     const API_URL = `https://api.open-meteo.com/v1/forecast?latitude=${DETROIT_LAT}&longitude=${DETROIT_LON}&current_weather=true`;
@@ -44,7 +44,7 @@ async function fetchWeather() {
     try {
         const response = await fetch(API_URL);
         const data = await response.json();
-        // Map the weather code from the API response to the description 
+        // Map the weather code from the API response to the description
         const weatherCode = data.current_weather.weathercode;
         return mapWeatherCodeToDescription(weatherCode);
     } catch (error) {
@@ -56,16 +56,16 @@ async function fetchWeather() {
 // --- 3. Get and Format Date/Time (Required Function) ---
 function getCurrentDateTime() {
     const now = new Date();
-    // Use 'America/New_York' for EST time zone [cite: 1]
+    // Use 'America/New_York' for EST time zone
     const options = { timeZone: 'America/New_York' };
 
-    // Time: 12-hour clock with AM/PM [cite: 1]
+    // Time: 12-hour clock with AM/PM (e.g., 1:03:45 PM)
     const time = now.toLocaleTimeString('en-US', { ...options, hour12: true, second: '2-digit' });
 
-    // Date: MM/DD/YYYY format [cite: 1]
+    // Date: MM/DD/YYYY format
     const date = now.toLocaleDateString('en-US', options);
 
-    // Get the hour (0-23) for the greeting message logic [cite: 1]
+    // Get the hour (0-23) for the greeting message logic (e.g., 13)
     const hour = now.toLocaleString('en-US', { ...options, hour: 'numeric', hourCycle: 'h23' });
     
     return { time, date, hour: parseInt(hour) };
@@ -74,31 +74,28 @@ function getCurrentDateTime() {
 // --- 4. Main Update Function (Updates Greeting/Time/Weather) ---
 async function updateWelcomeMessage() {
     const greetingEl = document.getElementById('greetingMessage');
-    const userName = localStorage.getItem('userName') || 'Friend'; // Get name from storage
+    const userName = localStorage.getItem('userName') || 'Friend'; 
 
     // --- Time/Date Logic ---
-    const { time, date, hour } = getCurrentDateTime();
+    const { time, date, hour } = getCurrentDateTime(); 
 
-    // Determine the greeting based on the hour [cite: 1]
+    // Determine the greeting based on the hour
     let greetingPrefix;
-    if (hour < 12) {
-        greetingPrefix = "Good morning"; // Before 12 PM [cite: 1]
-    } else if (hour < 18) {
-        greetingPrefix = "Good afternoon"; // 12 PM - 6 PM [cite: 1]
-    } else {
-        greetingPrefix = "Good evening"; // After 6 PM [cite: 1]
+    if (hour >= 5 && hour < 12) { // 5 AM to 11:59 AM
+        greetingPrefix = "Good morning";
+    } else if (hour >= 12 && hour < 18) { // 12 PM to 5:59 PM
+        greetingPrefix = "Good afternoon";
+    } else { // 6 PM to 4:59 AM
+        greetingPrefix = "Good evening";
     }
 
     // --- Weather Logic ---
-    // Only fetch weather once per minute or on initial load to avoid excessive API calls
-    // Note: The assignment only requires one API call inside the update logic, but for performance,
-    // a real-world app would cache this. Sticking to the requirement:
     const weatherDescription = await fetchWeather();
     
-    // --- Display Message ---
-    // Example message: Good morning Alex! It's 08:10:05 AM EST on 08/24/2024, and it's partly cloudy right now. [cite: 1]
+    // VVVV THIS IS THE CORRECTED LINE VVVV
+    // It correctly uses the 'time' variable for the clock
     greetingEl.innerHTML = 
-        `${greetingPrefix} ${userName}! It's ${time} EST on ${date}, and it's ${weatherDescription} right now.`;
+        `${greetingPrefix}, ${userName}! It's ${time} EST on ${date}, and it's ${weatherDescription} right now.`;
 }
 
 // --- 5. Last Visit Logic ---
@@ -109,13 +106,12 @@ function updateLastVisit() {
     const lastVisitTime = localStorage.getItem(LAST_VISIT_KEY);
     
     if (lastVisitTime) {
-        // Display last visit time [cite: 1]
         lastVisitEl.innerHTML = `Btw, you last visited on ${lastVisitTime}.`;
     } else {
         lastVisitEl.innerHTML = `Welcome! This looks like your first visit.`;
     }
 
-    // Update the last visit time for the next session [cite: 1]
+    // Update the last visit time for the next session
     const now = new Date();
     // Get formatted time/date in EST for storage
     const formattedTime = now.toLocaleString('en-US', { 
@@ -139,13 +135,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set the input field if the name is already stored
     nameInput.value = localStorage.getItem('userName') || '';
 
-    // Handle form submission to save the name [cite: 1]
+    // Handle form submission to save the name
     nameForm.addEventListener('submit', (event) => {
-        event.preventDefault(); // Prevent traditional form submission behavior [cite: 1]
+        event.preventDefault(); // Prevent traditional form submission behavior
         
         const enteredName = nameInput.value.trim();
         if (enteredName) {
-            localStorage.setItem('userName', enteredName); // Save the name to localStorage [cite: 1]
+            localStorage.setItem('userName', enteredName); // Save the name to localStorage
             alert(`Hello, ${enteredName}! Your name has been saved.`);
             // Rerun the update to immediately show the personalized greeting
             updateWelcomeMessage(); 
@@ -158,6 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial run of the welcome message
     updateWelcomeMessage(); 
     
-    // Update the message every second (1000 milliseconds) [cite: 1]
+    // Update the message every second (1000 milliseconds)
     setInterval(updateWelcomeMessage, 1000); 
 });
